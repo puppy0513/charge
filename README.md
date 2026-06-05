@@ -46,8 +46,52 @@ npm run start
 ## 주요 파일
 
 - `src/app/page.tsx`: 대시보드 단일 페이지 (클라이언트 컴포넌트)
+- `src/app/rebalancing/page.tsx`: 포트폴리오 리밸런싱 계산기
 - `src/app/layout.tsx`: 루트 레이아웃
 - `src/app/globals.css`: Tailwind + 기본 타이포/배경
+- `supabase/rebalancing_schema.sql`: 리밸런싱용 Supabase 테이블 DDL/시드
+- `vercel.json`: Vercel Cron 설정
+
+---
+
+## 포트폴리오 리밸런싱 계산기
+
+새 페이지는 `/rebalancing` 에서 열 수 있습니다.
+
+포함 기능:
+
+- 현재 보유 종목의 티커, 종목명, 현재가, 보유수량, 목표비중 편집
+- 현재 비중과 목표 비중 비교
+- 임계치 기반 알람 대상 표시
+- 종목별 매수/매도 필요 금액과 주식 수 계산
+- 해외 자산은 USD/KRW 환율을 반영해 원화 기준으로 계산
+- Supabase `portfolio_assets` 단일 테이블 저장
+
+Supabase에 아래 SQL을 먼저 반영하면 데이터가 바로 저장됩니다.
+
+- [`supabase/rebalancing_schema.sql`](/Users/baejunhyeon/charge/supabase/rebalancing_schema.sql)
+
+이 설계는 테이블 수를 최소화하기 위해 스냅샷 테이블을 두지 않고, 현재 자산 목록만 저장합니다.
+
+---
+
+## 가격 자동 동기화
+
+리밸런싱 페이지는 `/api/rebalancing/sync` 라우트로 현재가를 다시 받아와 `portfolio_assets.current_price` 를 갱신합니다.
+
+- 가격 소스: Twelve Data
+- 한국 종목 fallback: Naver Finance 종목 페이지
+- 해외 자산 평가용 환율: Twelve Data `USD/KRW`
+- Vercel Cron: 하루 1회 `00:00 UTC`
+- 보안: `CRON_SECRET` 가 있으면 `Authorization: Bearer <secret>` 헤더가 필요합니다.
+
+필요한 환경 변수:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `TWELVEDATA_API_KEY`
+- `CRON_SECRET` - 선택 사항이지만 Vercel에서는 권장
 
 ---
 

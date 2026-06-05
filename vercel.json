@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/rebalancing/sync",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
+

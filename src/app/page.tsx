@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, FocusEvent, useMemo, useState } from "react";
+import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 
 type NumberInputProps = {
@@ -264,6 +265,24 @@ export default function Page() {
               목표 수익에 달성하지 못하여 수수료가 발생하지 않았습니다
             </p>
           ) : null}
+        </section>
+
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-emerald-700">New Page</p>
+              <h2 className="mt-1 text-lg font-semibold text-neutral-900">포트폴리오 리밸런싱 계산기</h2>
+              <p className="mt-1 text-sm text-neutral-600">
+                Supabase 자산 테이블을 편집하고, 5% 임계치 기반의 매수/매도 추천을 계산합니다.
+              </p>
+            </div>
+            <Link
+              href="/rebalancing"
+              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500"
+            >
+              새 페이지 열기
+            </Link>
+          </div>
         </section>
 
         <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
