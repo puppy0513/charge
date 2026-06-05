@@ -248,13 +248,13 @@ export default function RebalancingDashboard({
   fxMessage
 }: RebalancingDashboardProps) {
   const [assets, setAssets] = useState<PortfolioAsset[]>(initialAssets);
-  const [thresholdPercent, setThresholdPercent] = useState<number>(5);
   const [saveState, setSaveState] = useState<SaveRebalanceState | null>(null);
   const [isPending, startTransition] = useTransition();
+  const alertThresholdPercent = 10;
 
   const summary = useMemo(
-    () => computeRebalanceSummary(assets, thresholdPercent, fxRate),
-    [assets, thresholdPercent, fxRate]
+    () => computeRebalanceSummary(assets, alertThresholdPercent, fxRate),
+    [assets, fxRate]
   );
 
   const bondRatio = summary.total_value > 0 ? (summary.by_class.bond / summary.total_value) * 100 : 0;
@@ -358,7 +358,7 @@ export default function RebalancingDashboard({
           <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur">
             <p className="text-xs uppercase tracking-[0.18em] text-white/50">알람 대상</p>
             <p className="mt-3 text-3xl font-semibold">{summary.alert_count}건</p>
-            <p className="mt-2 text-sm text-white/60">임계치 {formatPercent(thresholdPercent)} 이상 이탈한 자산 수</p>
+            <p className="mt-2 text-sm text-white/60">채권과 주식 비중 차이 {formatPercent(alertThresholdPercent)} 이상 시 알람</p>
           </div>
         </section>
 
@@ -561,7 +561,7 @@ export default function RebalancingDashboard({
           <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur">
             <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/50">운영 메모</h3>
             <ul className="mt-4 space-y-2 text-sm leading-6 text-white/70">
-              <li>• 임계치 {formatPercent(thresholdPercent)} 이상 이탈한 자산을 경고 대상으로 표시합니다.</li>
+              <li>• 채권과 주식 비중 차이가 {formatPercent(alertThresholdPercent)} 이상이면 알람을 표시합니다.</li>
               <li>• 현재 페이지는 일일 계산과 수동 저장을 지원하고, 이후 알람 자동화를 붙이기 좋게 설계했습니다.</li>
               <li>• 수량/가격을 바꾸면 즉시 매수·매도 추천치가 다시 계산됩니다.</li>
             </ul>
@@ -575,13 +575,8 @@ export default function RebalancingDashboard({
               <p className="mt-1 text-sm text-white/60">티커, 이름, 현재가, 수량, 목표 비중을 수정하고 Supabase에 저장합니다.</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-40">
-                <NumberField
-                  label="임계치"
-                  value={thresholdPercent}
-                  onChange={setThresholdPercent}
-                  suffix="%"
-                />
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
+                알람 기준: 채권-주식 비중 차이 {formatPercent(alertThresholdPercent)}
               </div>
               <button
                 type="button"

@@ -154,8 +154,6 @@ export function computeRebalanceSummary(
   const sell_value = rows
     .filter((row) => row.trade_value < 0)
     .reduce((sum, row) => sum + Math.abs(row.trade_value), 0);
-  const alert_count = rows.filter((row) => row.alert).length;
-  const max_drift = rows.reduce((max, row) => Math.max(max, Math.abs(row.drift)), 0);
   const byClass: Record<AssetClass, number> = {
     bond: 0,
     equity: 0,
@@ -165,6 +163,13 @@ export function computeRebalanceSummary(
   rows.forEach((row) => {
     byClass[row.asset_class] += row.current_value;
   });
+
+  const bondWeight = totalValue > 0 ? (byClass.bond / totalValue) * 100 : 0;
+  const equityWeight = totalValue > 0 ? (byClass.equity / totalValue) * 100 : 0;
+  const classGap = Math.abs(bondWeight - equityWeight);
+  const classAlert = classGap >= thresholdPercent;
+  const alert_count = classAlert ? 1 : 0;
+  const max_drift = round(classGap, 2);
 
   return {
     total_value: totalValue,
